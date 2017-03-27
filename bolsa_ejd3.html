@@ -91,7 +91,7 @@ var area = d3.svg.area()
     .x(function(d) { return x(d.date); })
     .y1(function(d) { return y(d.ret); });
 
-d3.csv("all_returns.csv", function(data) {
+d3.csv("https://raw.githubusercontent.com/jaguirrepeman/Stocks/master/all_returns_.csv", function(data) {
   var parse = d3.time.format("%Y-%m-%d").parse;
 
   // Nest stock values by method.
