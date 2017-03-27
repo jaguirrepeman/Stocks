@@ -24,22 +24,51 @@ svg {
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
 
-var m = [40, 120, 50, 40], //margenes
+var m = [40, 170, 50, 40], //margenes
     w = 960 - m[1] - m[3], //ancho
+    h = 500 - m[0] - m[2]; //alto
     h = 500 - m[0] - m[2]; //alto
 
 var x,
     y,
-    duration = 1500,
-    delay = 500;
+    duration = 1000;
 
 var color = d3.scale.category10();
+//color = 
+function colorf(key){
+  console.log("CLAVE")
+  console.log(key)
+  col = ""
+  if(key == "SPY")
+    col = "blue"
+  else if (key == "SDS")
+    col = "gray"
+  else if (key == "NASDAQ_ETF")
+    col = "green"
+  else if (key == "IBEX")
+    col = "yellow"
+  else if (key == "EUROSTOXX")
+    col = "orange"
+  else if (key == "HANG_SHENG")
+    col = "purple"
+  else if (key == "Cartera sin RF")
+    col = "black"
+  else if (key == "Uniforme")
+    col = "#008b00"
+  else if (key == "PCA")
+    col = "pink"
+  
+  return(col);
+}
 
 var svg = d3.select("body").append("svg")
     .attr("width", w + m[1] + m[3])
     .attr("height", h + m[0] + m[2])
   .append("g")
     .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+
+
 
 var stocks,
     methods;
@@ -62,7 +91,7 @@ var area = d3.svg.area()
     .x(function(d) { return x(d.date); })
     .y1(function(d) { return y(d.ret); });
 
-d3.csv("https://raw.githubusercontent.com/jaguirrepeman/Stocks/master/all_returns_.csv", function(data) {
+d3.csv("all_returns.csv", function(data) {
   var parse = d3.time.format("%Y-%m-%d").parse;
 
   // Nest stock values by method.
@@ -102,9 +131,12 @@ d3.csv("https://raw.githubusercontent.com/jaguirrepeman/Stocks/master/all_return
     d3.min(methods, function(d) { return d.minret}), 
     d3.max(methods, function(d) { return d.maxret})
   ]);
+
+  y.domain([-35, 15]);
+  
 // Define the axes
 var xAxis = d3.svg.axis().scale(x)
-    .orient("bottom").ticks(10).tickFormat(d3.time.format("%b"));;
+    .orient("bottom").ticks(10).tickFormat(d3.time.format("%d-%b"));;
 
 var yAxis = d3.svg.axis().scale(y)
     .orient("left").ticks(10);
@@ -133,34 +165,91 @@ var valueline = d3.svg.line()
       .remove();
 */
   setTimeout(lines, duration);
+
+  //LEYENDA
+svg.append("text").attr("font-size", "1.5em").attr("transform", "translate(770, 80)")
+  .attr("fill", "#002366").attr("font-weight", "bold").text("Carteras");
+
+
+var leg = svg.append("g").attr("transform", "translate(755, 120)");
+leg.append("circle").attr("r", 5).style("fill", "purple")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("HANG_SHENG");
+
+leg = svg.append("g").attr("transform", "translate(755, 150)");
+leg.append("circle").attr("r", 5).style("fill", "yellow")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("IBEX");
+
+leg = svg.append("g").attr("transform", "translate(755, 180)");
+leg.append("circle").attr("r", 5).style("fill", "black")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("Optimizada sin RF");
+
+leg = svg.append("g").attr("transform", "translate(755, 210)");
+leg.append("circle").attr("r", 5).style("fill", "#008b00")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("Uniforme");
+
+leg = svg.append("g").attr("transform", "translate(755, 240)");
+leg.append("circle").attr("r", 5).style("fill", "blue")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("SPY");
+
+leg = svg.append("g").attr("transform", "translate(755, 270)");
+leg.append("circle").attr("r", 5).style("fill", "pink")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("PCA");
+
+leg = svg.append("g").attr("transform", "translate(755, 300)");
+leg.append("circle").attr("r", 5).style("fill", "orange")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("EUROSTOXX");
+
+leg = svg.append("g").attr("transform", "translate(755, 330)");
+leg.append("circle").attr("r", 5).style("fill", "gray")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("SDS");
+
+leg = svg.append("g").attr("transform", "translate(755, 360)");
+leg.append("circle").attr("r", 5).style("fill", "green")
+        .style("stroke", "#000").style("stroke-width", "2px");
+leg.append("text").attr("x", 12).attr("dy", ".31em").text("NASDAQ");
+
+
 });
 
+svg.append("rect").attr("transform", "translate(725, 50)")
+.style("fill", "red").attr("fill-opacity", "0.1")
+.attr("width", "200").attr("height", "350");
+
 function lines() {
- // var g = svg.selectAll(".method")
- /*
-      .attr("transform", function(d, i) { 
-        return "translate(0," + (i * h / 4 + 10) + ")"; 
-      });
-*/
-var g = svg.selectAll(".method")
-  g.each(function(d) {
-    var e = d3.select(this);
+  // var g = svg.selectAll(".method")
+  /*
+        .attr("transform", function(d, i) { 
+          return "translate(0," + (i * h / 4 + 10) + ")"; 
+        });
+  */
+  var g = svg.selectAll(".method")
+    g.each(function(d) {
+      var e = d3.select(this);
 
-    e.append("path")
-        .attr("class", "line")
-        .style("stroke", function(d) { return color(d.key); })
-        ;
+      e.append("path")
+          .attr("class", "line")
+          .style("stroke", function(d) { return colorf(d.key); })
+          ;
 
-    e.append("circle")
-        .attr("r", 5)
-        .style("fill", function(d) { return color(d.key); })
-        .style("stroke", "#000")
-        .style("stroke-width", "2px");
-
-    e.append("text")
-        .attr("x", 12)
-        .attr("dy", ".31em")
-        .text(d.key);
+      e.append("circle")
+          .attr("r", 5)
+          .style("fill", function(d) { return colorf(d.key); })
+          .style("stroke", "#000")
+          .style("stroke-width", "2px");
+  /*
+      e.append("text")
+          .attr("x", 12)
+          .attr("dy", ".31em")
+          .text(d.key);
+  */
   });
 
   function draw(k) {
@@ -171,7 +260,7 @@ var g = svg.selectAll(".method")
       e.select("path")
           .attr("d", function(d) { return line(d.values.slice(0, k + 1)); });
 
-      e.selectAll("circle, text")
+      e.selectAll("circle")
           .data(function(d) { return [d.values[k], d.values[k]]; })
           .attr("transform", function(d) {
            return "translate(" + x(d.date) + "," + y(d.ret) + ")"; 
